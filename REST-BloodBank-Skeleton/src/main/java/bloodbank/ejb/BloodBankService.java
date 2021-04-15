@@ -146,4 +146,34 @@ public class BloodBankService implements Serializable {
             em.remove(person);
         }
     }
+
+    public List<BloodBank> getAllBloodBanks() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public BloodBank getBloodBankById(int id) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public boolean isDuplicated(BloodBank newBloodbank) {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    public BloodBank persistBloodBank(BloodBank newBloodbank) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public BloodBank updateBloodBank(int bbID, BloodBank bb) {
+        // TODO Auto-generated method stub
+        return bb;
+    }
+
+    public BloodBank deleteBloodBank(int id) {
+        // TODO Auto-generated method stub
+        return null;
+    }
 }
