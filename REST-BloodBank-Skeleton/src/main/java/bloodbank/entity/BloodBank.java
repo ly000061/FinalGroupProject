@@ -31,16 +31,21 @@ import bloodbank.rest.serializer.BloodBankSerializer;
 @Entity
 @Table( name = "blood_bank")
 @NamedQuery( name = BloodBank.ALL_BLOODBANKS_QUERY_NAME, query = "SELECT distinct b FROM BloodBank b left JOIN FETCH b.donations")
+@NamedQuery(name=BloodBank.FIND_BloodBank_BY_ID_QUERY, query= "select b from Bloodbank b where b.id = :param1")
+@NamedQuery(name=BloodBank.ALL_BLOODDONATIONS_QUERY_NAME, query= "SELECT b FROM BloodDonation b left join fetch b.bank where b.bank_id=:param1")
 @Inheritance( strategy = InheritanceType.SINGLE_TABLE)
 @AttributeOverride( name = "id", column = @Column( name = "bank_id"))
 //columnDefinition, discriminatorType
 @DiscriminatorColumn( columnDefinition = "bit(1)", name = "privately_owned", discriminatorType = DiscriminatorType.INTEGER)
 @JsonSerialize(using = BloodBankSerializer.class)
+//@JsonDeserialize()
 public abstract class BloodBank extends PojoBase implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	public static final String ALL_BLOODBANKS_QUERY_NAME = "BloodBank.findAll";
-	public static final String DONATION_COUNT = "BloodBank.donationCOunt";
+	public static final String ALL_BLOODDONATIONS_QUERY_NAME = "BloodDonation.findAll";
+	public static final String FIND_BloodBank_BY_ID_QUERY = "BloodBank.findById";
+	public static final String DONATION_COUNT = "BloodBank.donationCount";
 
 	@Basic( optional = false)
 	@Column( nullable = false, length = 100)

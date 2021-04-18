@@ -7,7 +7,7 @@ SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,N
 -- -----------------------------------------------------
 -- Schema bloodbank
 -- -----------------------------------------------------
-CREATE SCHEMA IF NOT EXISTS `bloodbank` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci ;
+CREATE SCHEMA IF NOT EXISTS `bloodbank` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci ;
 USE `bloodbank` ;
 
 -- -----------------------------------------------------
@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS `bloodbank`.`address` (
 ENGINE = InnoDB
 AUTO_INCREMENT = 2
 DEFAULT CHARACTER SET = utf8mb4
-COLLATE = utf8mb4_0900_ai_ci;
+COLLATE = utf8mb4_general_ci;
 
 
 -- -----------------------------------------------------
@@ -45,7 +45,7 @@ CREATE TABLE IF NOT EXISTS `bloodbank`.`blood_bank` (
   UNIQUE INDEX `name_UNIQUE` (`name` ASC) VISIBLE)
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb4
-COLLATE = utf8mb4_0900_ai_ci;
+COLLATE = utf8mb4_general_ci;
 
 
 -- -----------------------------------------------------
@@ -67,7 +67,7 @@ CREATE TABLE IF NOT EXISTS `bloodbank`.`blood_donation` (
     REFERENCES `bloodbank`.`blood_bank` (`bank_id`))
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb4
-COLLATE = utf8mb4_0900_ai_ci;
+COLLATE = utf8mb4_general_ci;
 
 
 -- -----------------------------------------------------
@@ -84,7 +84,7 @@ CREATE TABLE IF NOT EXISTS `bloodbank`.`person` (
 ENGINE = InnoDB
 AUTO_INCREMENT = 2
 DEFAULT CHARACTER SET = utf8mb4
-COLLATE = utf8mb4_0900_ai_ci;
+COLLATE = utf8mb4_general_ci;
 
 
 -- -----------------------------------------------------
@@ -102,7 +102,7 @@ CREATE TABLE IF NOT EXISTS `bloodbank`.`phone` (
 ENGINE = InnoDB
 AUTO_INCREMENT = 3
 DEFAULT CHARACTER SET = utf8mb4
-COLLATE = utf8mb4_0900_ai_ci;
+COLLATE = utf8mb4_general_ci;
 
 
 -- -----------------------------------------------------
@@ -132,7 +132,7 @@ CREATE TABLE IF NOT EXISTS `bloodbank`.`contact` (
     REFERENCES `bloodbank`.`phone` (`phone_id`))
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb4
-COLLATE = utf8mb4_0900_ai_ci;
+COLLATE = utf8mb4_general_ci;
 
 
 -- -----------------------------------------------------
@@ -148,6 +148,7 @@ CREATE TABLE IF NOT EXISTS `bloodbank`.`donation_record` (
   `version` INT NOT NULL DEFAULT '1',
   PRIMARY KEY (`record_id`),
   UNIQUE INDEX `record_id_UNIQUE` (`record_id` ASC) VISIBLE,
+  UNIQUE INDEX `donation_id_UNIQUE` (`donation_id` ASC) VISIBLE,
   INDEX `fk_donation_record_person1_idx` (`person_id` ASC) VISIBLE,
   INDEX `fk_donation_record_blood_donation1_idx` (`donation_id` ASC) VISIBLE,
   CONSTRAINT `fk_donation_record_blood_donation1`
@@ -158,7 +159,7 @@ CREATE TABLE IF NOT EXISTS `bloodbank`.`donation_record` (
     REFERENCES `bloodbank`.`person` (`id`))
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb4
-COLLATE = utf8mb4_0900_ai_ci;
+COLLATE = utf8mb4_general_ci;
 
 
 -- -----------------------------------------------------

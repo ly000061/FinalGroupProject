@@ -10,8 +10,13 @@
  */
 package bloodbank.ejb;
 
-import static bloodbank.entity.BloodBank.ALL_BLOODBANKS_QUERY_NAME;
+
 import static bloodbank.entity.Person.ALL_PERSONS_QUERY_NAME;
+import static bloodbank.entity.Person.ALL_RECORDS_QUERY_NAME;
+import static bloodbank.entity.BloodBank.ALL_BLOODBANKS_QUERY_NAME;
+import static bloodbank.entity.BloodBank.ALL_BLOODDONATIONS_QUERY_NAME;
+import static bloodbank.entity.BloodBank.FIND_BloodBank_BY_ID_QUERY;
+import static bloodbank.entity.Person.FIND_PERSON_BY_ID_QUERY;
 import static bloodbank.entity.SecurityRole.ROLE_BY_NAME_QUERY;
 import static bloodbank.entity.SecurityUser.USER_FOR_OWNING_PERSON_QUERY;
 import static bloodbank.utility.MyConstants.DEFAULT_KEY_SIZE;
@@ -27,12 +32,12 @@ import static bloodbank.utility.MyConstants.PROPERTY_KEYSIZE;
 import static bloodbank.utility.MyConstants.PROPERTY_SALTSIZE;
 import static bloodbank.utility.MyConstants.PU_NAME;
 import static bloodbank.utility.MyConstants.USER_ROLE;
-
 import java.io.Serializable;
-import java.util.Collections;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.ejb.Singleton;
 import javax.inject.Inject;
@@ -44,7 +49,6 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 import javax.security.enterprise.identitystore.Pbkdf2PasswordHash;
 import javax.transaction.Transactional;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.hibernate.Hibernate;
@@ -52,7 +56,10 @@ import org.hibernate.Hibernate;
 import bloodbank.entity.Address;
 import bloodbank.entity.BloodBank;
 import bloodbank.entity.BloodDonation;
+import bloodbank.entity.Contact;
+import bloodbank.entity.DonationRecord;
 import bloodbank.entity.Person;
+import bloodbank.entity.Phone;
 import bloodbank.entity.SecurityRole;
 import bloodbank.entity.SecurityUser;
 
@@ -72,16 +79,23 @@ public class BloodBankService implements Serializable {
     protected Pbkdf2PasswordHash pbAndjPasswordHash;
 
     public List<Person> getAllPeople() {
-    	return null;
+        return em.createNamedQuery(ALL_PERSONS_QUERY_NAME, Person.class).getResultList();
     }
 
     public Person getPersonId(int id) {
-    	return null;
+        Person bob = null;
+        try {
+            bob = em.createNamedQuery(FIND_PERSON_BY_ID_QUERY, Person.class).setParameter(id, PARAM1).getSingleResult();
+            return bob;
+        }
+        catch (Exception e) {return null; }
     }
+    
 
     @Transactional
     public Person persistPerson(Person newPerson) {
-    	return null;
+        em.persist(newPerson);
+        return newPerson;
     }
 
     @Transactional
@@ -107,7 +121,27 @@ public class BloodBankService implements Serializable {
 
     @Transactional
     public Person setAddressFor(int id, Address newAddress) {
-    	return null;
+        Person addressPerson = em.find(Person.class, id); 
+        newAddress.setContacts(addressPerson.getContacts());
+        Set< Contact> addressContact = addressPerson.getContacts();
+        
+        ((Contact) addressContact).setAddress(newAddress);
+        addressPerson.setContacts(addressContact);
+        em.merge(addressPerson);
+        em.flush();
+        return addressPerson;
+    }
+    
+    @Transactional
+    public Person setPhoneFor(int id, Phone newPhone) {
+        Person phonePerson = em.find(Person.class, id);
+        newPhone.setContacts(phonePerson.getContacts());
+        Set< Contact> addressContact = phonePerson.getContacts();
+        ((Contact) addressContact).setPhone(newPhone);
+        phonePerson.setContacts(addressContact);
+        em.merge(phonePerson);
+        em.flush();
+        return phonePerson;
     }
 
     /**
@@ -133,6 +167,7 @@ public class BloodBankService implements Serializable {
      * 
      * @param id - person id to delete
      */
+    
     @Transactional
     public void deletePersonById(int id) {
         Person person = getPersonId(id);
@@ -148,31 +183,78 @@ public class BloodBankService implements Serializable {
     }
 
     public List<BloodBank> getAllBloodBanks() {
-        // TODO Auto-generated method stub
-        return null;
+        return em.createNamedQuery(ALL_BLOODBANKS_QUERY_NAME, BloodBank.class).getResultList();
     }
 
     public BloodBank getBloodBankById(int id) {
-        // TODO Auto-generated method stub
-        return null;
+        BloodBank bb = null;
+        try {bb = em.createNamedQuery(FIND_BloodBank_BY_ID_QUERY, BloodBank.class).setParameter(id, PARAM1).getSingleResult();
+            return bb;
+        }
+        catch (Exception e) {return null; }
     }
 
     public boolean isDuplicated(BloodBank newBloodbank) {
-        // TODO Auto-generated method stub
-        return false;
+        boolean placeholder = false;
+        return placeholder;
     }
 
+    @Transactional
     public BloodBank persistBloodBank(BloodBank newBloodbank) {
+        em.persist(newBloodbank);
+        return newBloodbank;
+    }
+
+    public BloodBank updateBloodBank(int bbID, BloodBank bb) {
+        BloodBank bloodBankToBeUpdated = getBloodBankById(bbID);
+        if (bloodBankToBeUpdated != null) {
+            em.refresh(bloodBankToBeUpdated);
+            em.merge(bloodBankToBeUpdated);
+            em.flush();
+        }
+        return bloodBankToBeUpdated;
+    }
+    
+    @Transactional
+    public BloodBank deleteBloodBank(int id) {
+        BloodBank bb = getBloodBankById(id);
+        if (bb != null) {
+            em.refresh(bb);  
+            em.remove(bb);
+        }
+        return null;
+    }
+    
+    @Transactional
+    public BloodBank deleteDonationRecord(int id) {
+        BloodBank bb = getBloodBankById(id);
+        if (bb != null) {
+            em.refresh(bb);  
+            em.remove(bb);
+        }
+        return null;
+    }
+    
+    public <T> T getById(Class<T> entity, String namedQuery, int id) {
+        TypedQuery<T> searchQuery = em.createNamedQuery(namedQuery, entity);
+        searchQuery.setParameter(PARAM1, id);
+        return searchQuery.getSingleResult();
+    }
+
+    public List<BloodDonation> getAllDonations(BloodBank bb) {
+        return em.createNamedQuery(ALL_BLOODDONATIONS_QUERY_NAME, BloodDonation.class).getResultList();
+    }
+
+    public List<DonationRecord> getAllRecords(Person pp) {
+        return em.createNamedQuery(ALL_RECORDS_QUERY_NAME, DonationRecord.class).getResultList();
+    }
+
+    public Address getAddress(Person addressPerson) {
         // TODO Auto-generated method stub
         return null;
     }
 
-    public BloodBank updateBloodBank(int bbID, BloodBank bb) {
-        // TODO Auto-generated method stub
-        return bb;
-    }
-
-    public BloodBank deleteBloodBank(int id) {
+    public Phone getPhone(Person phonePerson) {
         // TODO Auto-generated method stub
         return null;
     }

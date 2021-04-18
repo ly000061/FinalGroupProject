@@ -40,9 +40,11 @@ public interface MyConstants {
     public static final String PRODUCT_RESOURCE_NAME =  "product";
     public static final String BLOODBANK_RESOURCE_NAME =  "bloodbank";
     public static final String CUSTOMER_ADDRESS_SUBRESOURCE_NAME =  "address";
+    public static final String CUSTOMER_PHONE_SUBRESOURCE_NAME =  "address";
     public static final String CUSTOMER_ADDRESS_RESOURCE_PATH =
         RESOURCE_PATH_ID_PATH + SLASH + CUSTOMER_ADDRESS_SUBRESOURCE_NAME;
-
+    public static final String CUSTOMER_PHONE_RESOURCE_PATH =
+            RESOURCE_PATH_ID_PATH + SLASH + CUSTOMER_PHONE_SUBRESOURCE_NAME;
     //Security constants
     public static final String USER_ROLE = "USER_ROLE";
     public static final String ADMIN_ROLE = "ADMIN_ROLE";

@@ -1,5 +1,7 @@
 package bloodbank.entity;
 
+
+
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Objects;
@@ -24,12 +26,16 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 @Entity
 @Table( name = "person")
 @NamedQuery( name = Person.ALL_PERSONS_QUERY_NAME, query = "SELECT p FROM Person p")
+@NamedQuery( name = Person.ALL_RECORDS_QUERY_NAME, query = "SELECT d FROM DonationRecord d left join fetch d.person where d.person_id=:param1")
+@NamedQuery(name=Person.FIND_PERSON_BY_ID_QUERY, query= "select p from Person p where p.id = :param1")
 //@AttributeOverride( name = "id", column = @Column( name = "id"))
 //no need for AttributeOverride as person is column is called id as well.
 public class Person extends PojoBase implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
+	public static final String ALL_RECORDS_QUERY_NAME = "Person.findAll";
 	public static final String ALL_PERSONS_QUERY_NAME = "Person.findAll";
+	public static final String FIND_PERSON_BY_ID_QUERY = "Person.findById";
 
 	@Basic( optional = false)
 	@Column( name = "first_name", nullable = false, length = 50)
@@ -104,5 +110,7 @@ public class Person extends PojoBase implements Serializable {
 		return Objects.equals( getFirstName(), other.getFirstName())
 				&& Objects.equals( getLastName(), other.getLastName());
 	}
+
+   
 
 }

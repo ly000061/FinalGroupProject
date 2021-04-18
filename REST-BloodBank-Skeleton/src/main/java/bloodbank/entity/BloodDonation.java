@@ -24,6 +24,7 @@ import org.hibernate.Hibernate;
 @Entity
 @Table( name = "blood_donation")
 @NamedQuery( name = "BloodDonation.findAll", query = "SELECT b FROM BloodDonation b")
+@NamedQuery( name = "BloodDonation.findAll", query = "SELECT b FROM BloodDonation b left join fetch b.bank l left join fetch b.record where b.id=:param1")
 @AttributeOverride( name = "id", column = @Column( name = "donation_id"))
 public class BloodDonation extends PojoBase implements Serializable {
 	private static final long serialVersionUID = 1L;

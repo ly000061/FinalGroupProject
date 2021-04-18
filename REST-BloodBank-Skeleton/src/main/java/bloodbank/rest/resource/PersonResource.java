@@ -8,6 +8,7 @@ package bloodbank.rest.resource;
 
 import static bloodbank.utility.MyConstants.ADMIN_ROLE;
 import static bloodbank.utility.MyConstants.CUSTOMER_ADDRESS_RESOURCE_PATH;
+import static bloodbank.utility.MyConstants.CUSTOMER_PHONE_RESOURCE_PATH;
 import static bloodbank.utility.MyConstants.PERSON_RESOURCE_NAME;
 import static bloodbank.utility.MyConstants.RESOURCE_PATH_ID_ELEMENT;
 import static bloodbank.utility.MyConstants.RESOURCE_PATH_ID_PATH;
@@ -21,6 +22,7 @@ import javax.ejb.EJB;
 import javax.inject.Inject;
 import javax.security.enterprise.SecurityContext;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.ForbiddenException;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -37,7 +39,11 @@ import org.glassfish.soteria.WrappingCallerPrincipal;
 
 import bloodbank.ejb.BloodBankService;
 import bloodbank.entity.Address;
+import bloodbank.entity.BloodBank;
+import bloodbank.entity.BloodDonation;
+import bloodbank.entity.DonationRecord;
 import bloodbank.entity.Person;
+import bloodbank.entity.Phone;
 import bloodbank.entity.SecurityUser;
 
 @Path( PERSON_RESOURCE_NAME)
@@ -108,4 +114,67 @@ public class PersonResource {
 		response = Response.ok( updatedPerson).build();
 		return response;
 	}
+	
+	@PUT
+    @RolesAllowed( { ADMIN_ROLE })
+    @Path( CUSTOMER_PHONE_RESOURCE_PATH)
+    public Response addPhoneForPerson( @PathParam( RESOURCE_PATH_ID_ELEMENT) int id, Phone newPhone) {
+        Response response = null;
+        Person updatedPerson = service.setPhoneFor( id, newPhone);
+        response = Response.ok( updatedPerson).build();
+        return response;
+    }
+	
+	@GET
+    @RolesAllowed({ADMIN_ROLE})
+	@Path( CUSTOMER_PHONE_RESOURCE_PATH)
+    public Response getPhone(Person phonePerson) {
+     
+	    Phone target = service.getPhone(phonePerson);
+        Response response = Response.ok( target).build();
+        return response;
+    }
+	
+	@GET
+    @RolesAllowed({ADMIN_ROLE})
+	@Path( CUSTOMER_ADDRESS_RESOURCE_PATH)
+    public Response getAddress(Person addressPerson) {
+     
+        Address target = service.getAddress(addressPerson);
+        Response response = Response.ok( target).build();
+        return response;
+    }
+	
+	@DELETE
+    @RolesAllowed({ADMIN_ROLE})
+    @Path(RESOURCE_PATH_ID_PATH)
+    public Response deletePerson(@PathParam(RESOURCE_PATH_ID_ELEMENT) int id) {
+	    Response response = null;
+	    service.deletePersonById(id);
+	    List< Person> persons = service.getAllPeople();
+        response = Response.ok( persons).build();
+        return response;
+    }
+	
+	@RolesAllowed( { ADMIN_ROLE })
+    @POST
+    @Path("/{id}/donationrecord")
+    public Response addDonationRecordToPerson( @PathParam("id") int id, DonationRecord newDonation) {
+        Person bb = service.getPersonId( id);
+        newDonation.setOwner( bb);
+        bb.getDonations().add( newDonation);
+        service.updatePersonById( id, bb);
+        return Response.ok( bb).build();
+    }
+	
+	@GET
+    @Path("/{id}/donationrecord")
+    public Response getBloodDonations(@PathParam("id") int id) {
+	    Person pp = service.getPersonId(id);
+        List< DonationRecord> donate = service.getAllRecords(pp);
+        
+        Response response = Response.ok( donate).build();
+        return response;
+    }
+
 }

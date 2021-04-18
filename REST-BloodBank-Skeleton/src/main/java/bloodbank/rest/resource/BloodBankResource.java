@@ -87,14 +87,24 @@ public class BloodBankResource {
     @Path("/{id}/blooddonation")
     public Response addBloodDonationToBloodBank( @PathParam("id") int bbID, BloodDonation newBloodDonation) {
         LOG.debug( "add a new BloodDonation to bloodbank={} ...", bbID);
-        
         BloodBank bb = service.getBloodBankById( bbID);
         newBloodDonation.setBank( bb);
         bb.getDonations().add( newBloodDonation);
         service.updateBloodBank( bbID, bb);
-        
         return Response.ok( bb).build();
     }
+    
+    @GET
+    @Path("/{id}/blooddonation")
+    public Response getBloodDonations(@PathParam("id") int bbID) {
+        BloodBank bb = service.getBloodBankById(bbID);
+        List< BloodDonation> donate = service.getAllDonations(bb);
+        
+        Response response = Response.ok( donate).build();
+        return response;
+    }
+    
+    
 
     /**
      * response that displays for updating BloodBank by id
@@ -119,7 +129,6 @@ public class BloodBankResource {
     @Path( RESOURCE_PATH_ID_PATH)
     public Response deleteBloodBank( @PathParam( RESOURCE_PATH_ID_ELEMENT) int id) {
         LOG.debug( "update a specific BloodBank ...");
-//      BloodBank bb = service.getBloodBankById( id);
         BloodBank bb = service.deleteBloodBank( id);
         Response response  = Response.ok( bb).build();
         return response;
